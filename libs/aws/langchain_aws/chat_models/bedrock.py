@@ -316,7 +316,7 @@ class ChatPromptAdapter:
         )
 
 
-_message_type_lookups = {"human": "user", "ai": "assistant"}
+_message_type_lookups = {"human": "user", "ai": "assistant", "tool": "user"}
 
 
 class ChatBedrock(BaseChatModel, BedrockBase):
