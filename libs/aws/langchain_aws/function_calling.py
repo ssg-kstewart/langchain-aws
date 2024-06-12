@@ -1,4 +1,4 @@
-"""Methods for creating function specs in the style of Bedrock Functions 
+"""Methods for creating function specs in the style of Bedrock Functions
 for supported model providers"""
 
 import json
@@ -12,6 +12,7 @@ from typing import (
     Union,
 )
 
+from langchain_core.messages import ToolCall
 from langchain_core.pydantic_v1 import BaseModel
 from langchain_core.tools import BaseTool
 from langchain_core.utils.function_calling import convert_to_openai_tool
@@ -139,8 +140,8 @@ def convert_to_anthropic_tool(
         )
 
 
-def parse_tool_calls_from_xml(xml_str: str) -> List[Dict[Any, Any]]:
-    tool_calls: List[Dict[Any, Any]] = []
+def parse_tool_calls_from_xml(xml_str: str) -> List[ToolCall]:
+    tool_calls: List[ToolCall] = []
     invokes = xml_str.split("<invoke>")[1:]
     for invoke in invokes:
         tool_name = invoke.split("<tool_name>")[1].split("</tool_name>")[0]
@@ -154,8 +155,10 @@ def parse_tool_calls_from_xml(xml_str: str) -> List[Dict[Any, Any]]:
             tag = tag.strip()
             value = value.split("</")[0]
             parameters[tag] = value
-        tool_call = {
-            "function": {"name": tool_name, "arguments": parameters, "type": "function"}
-        }
+        tool_call = ToolCall(
+            name=tool_name,
+            args=parameters,
+            id=None,
+        )
         tool_calls.append(tool_call)
     return tool_calls
