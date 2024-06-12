@@ -457,11 +457,18 @@ class ChatBedrock(BaseChatModel, BedrockBase):
                 llm_output["stop_reason"] = "end_turn"
 
         llm_output["model_id"] = self.model_id
-        ai_message = AIMessage(
-            content=completion,
-            tool_calls=tool_calls,
-            additional_kwargs=llm_output,
-        )
+
+        if tool_calls:
+            ai_message = AIMessage(
+                content=completion,
+                tool_calls=tool_calls,
+                additional_kwargs=llm_output,
+            )
+        else:
+            ai_message = AIMessage(
+                content=completion,
+                additional_kwargs=llm_output,
+            )
 
         return ChatResult(
             generations=[ChatGeneration(message=ai_message)],
