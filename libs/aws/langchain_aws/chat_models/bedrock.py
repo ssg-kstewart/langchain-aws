@@ -408,6 +408,7 @@ class ChatBedrock(BaseChatModel, BedrockBase):
             self._get_provider(), "stop_reason"
         )
         tool_calls = []
+        generation_info = None
 
         if self.streaming:
             response_metadata: List[Dict[str, Any]] = []
@@ -452,11 +453,10 @@ class ChatBedrock(BaseChatModel, BedrockBase):
                 # format tool_calls parameter
                 tool_calls = parse_tool_calls_from_xml(completion)
                 llm_output["tool_calls"] = tool_calls
-                llm_output["stop_reason"] = "tool_use"
+                generation_info = {"finish_reason": "tool_calls"}
+                completion = ""
             else:
                 llm_output["stop_reason"] = "end_turn"
-
-        llm_output["model_id"] = self.model_id
 
         ai_message = AIMessage(
             content=completion,
@@ -465,7 +465,9 @@ class ChatBedrock(BaseChatModel, BedrockBase):
         )
 
         return ChatResult(
-            generations=[ChatGeneration(message=ai_message)],
+            generations=[
+                ChatGeneration(generation_info=generation_info, message=ai_message)
+            ],
             llm_output=llm_output,
         )
 
