@@ -1,7 +1,9 @@
 """Methods for creating function specs in the style of Bedrock Functions
 for supported model providers"""
 
+import base64
 import json
+import uuid
 from typing import (
     Any,
     Callable,
@@ -158,7 +160,13 @@ def parse_tool_calls_from_xml(xml_str: str) -> List[ToolCall]:
         tool_call = ToolCall(
             name=tool_name,
             args=parameters,
-            id=None,
+            id=generate_tool_call_id(),
         )
         tool_calls.append(tool_call)
     return tool_calls
+
+
+def generate_tool_call_id() -> str:
+    random_bytes = uuid.uuid4().bytes
+    encoded_bytes = base64.urlsafe_b64encode(random_bytes).rstrip(b"=")
+    return f"call_{encoded_bytes.decode('utf-8')}"
