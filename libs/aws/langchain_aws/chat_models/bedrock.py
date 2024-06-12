@@ -454,7 +454,6 @@ class ChatBedrock(BaseChatModel, BedrockBase):
                 tool_calls = parse_tool_calls_from_xml(completion)
                 llm_output["tool_calls"] = tool_calls
                 generation_info = {"finish_reason": "tool_calls"}
-                completion = ""
             else:
                 llm_output["stop_reason"] = "end_turn"
 
